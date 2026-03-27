@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Theodor-Ioan Rolea — ML Engineer &amp; CS Student</title>
-  <meta name="description" content="CS &amp; Engineering student at UPB. Quantitative trader turned ML engineer. Building predictive models, data pipelines, and things that matter." />
+  <title>Theodor-Ioan Rolea</title>
+  <meta name="description" content="CS &amp; Engineering student at UPB. Quantitative trader turned ML engineer." />
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Syne:wght@400..800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -32,11 +32,11 @@
       font-size: 14px;
       line-height: 1.7;
       overflow-x: hidden;
-      cursor: none;
     }
 
-    /* Custom cursor */
+    /* ── Custom cursor (hidden on touch via JS + CSS) ── */
     #cursor {
+      display: none;
       position: fixed;
       top: -100px; left: -100px;
       width: 12px; height: 12px;
@@ -47,6 +47,7 @@
       clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
     }
     #cursor-ring {
+      display: none;
       position: fixed;
       top: -100px; left: -100px;
       width: 36px; height: 36px;
@@ -63,28 +64,34 @@
       border-color: var(--green);
       opacity: 1;
     }
+    body.has-mouse { cursor: none; }
+    body.has-mouse #cursor,
+    body.has-mouse #cursor-ring { display: block; }
+    body.has-mouse a,
+    body.has-mouse button { cursor: none; }
 
     /* Scanlines */
     body::before {
       content: '';
-      position: fixed;
-      inset: 0;
+      position: fixed; inset: 0;
       background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
       pointer-events: none;
       z-index: 100;
     }
 
-    /* Grain */
-    body::after {
-      content: '';
-      position: fixed;
-      inset: -200%;
-      width: 500%; height: 500%;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
-      opacity: 0.35;
-      pointer-events: none;
-      z-index: 99;
-      animation: grain 0.5s steps(1) infinite;
+    /* Grain — desktop/mouse only */
+    @media (hover: hover) {
+      body::after {
+        content: '';
+        position: fixed;
+        inset: -200%;
+        width: 500%; height: 500%;
+        background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+        opacity: 0.35;
+        pointer-events: none;
+        z-index: 99;
+        animation: grain 0.5s steps(1) infinite;
+      }
     }
     @keyframes grain {
       0%   { transform: translate(0,0); }
@@ -95,7 +102,7 @@
       100% { transform: translate(0,0); }
     }
 
-    /* NAV */
+    /* ── NAV ── */
     nav {
       position: fixed; top: 0; left: 0; right: 0; z-index: 500;
       display: flex; justify-content: space-between; align-items: center;
@@ -117,7 +124,7 @@
     }
     .nav-links a:hover { color: var(--green); }
 
-    /* HERO */
+    /* ── HERO ── */
     #hero {
       min-height: 100dvh; display: flex; flex-direction: column;
       justify-content: center; padding: 6rem 3rem 4rem;
@@ -155,7 +162,7 @@
       display: inline-flex; align-items: center; gap: 0.5rem;
       padding: 0.7rem 1.4rem; font-family: var(--font-mono);
       font-size: 0.8rem; text-decoration: none;
-      letter-spacing: 0.05em; transition: all 0.2s; cursor: none;
+      letter-spacing: 0.05em; transition: all 0.2s;
     }
     .btn-primary { background: var(--green); color: #0a0c09; font-weight: 700; }
     .btn-primary:hover { background: #fff; }
@@ -185,7 +192,6 @@
       padding: 1.5rem; font-size: 0.75rem; color: var(--text-dim); width: 300px;
       opacity: 0; animation: fadeLeft 0.8s ease 1.2s forwards;
     }
-    @media (max-width: 900px) { .terminal { display: none; } }
     .terminal-bar { display: flex; gap: 0.4rem; margin-bottom: 1rem; }
     .dot { width: 10px; height: 10px; border-radius: 50%; }
     .dot-r { background: #ff5f57; }
@@ -201,7 +207,7 @@
     }
     @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
 
-    /* SECTIONS */
+    /* ── SECTIONS ── */
     section { padding: 6rem 3rem; max-width: 900px; margin: 0 auto; }
     .section-label {
       font-size: 0.7rem; letter-spacing: 0.18em; text-transform: uppercase;
@@ -210,19 +216,17 @@
     .section-title {
       font-family: var(--font-display);
       font-size: clamp(1.8rem, 4vw, 3rem); font-weight: 800;
-      letter-spacing: -0.03em; color: #fff;
-      margin-bottom: 3rem; line-height: 1.1;
+      letter-spacing: -0.03em; color: #fff; margin-bottom: 3rem; line-height: 1.1;
     }
     .divider {
       width: 100%; height: 1px; background: var(--border);
       margin: 0 3rem; max-width: calc(900px - 6rem);
     }
 
-    /* EXPERIENCE */
+    /* ── EXPERIENCE ── */
     .exp-item {
       display: grid; grid-template-columns: 200px 1fr;
-      gap: 2rem; padding: 2rem 0;
-      border-bottom: 1px solid var(--border);
+      gap: 2rem; padding: 2rem 0; border-bottom: 1px solid var(--border);
     }
     .exp-meta { color: var(--text-dim); font-size: 0.75rem; }
     .exp-date { color: var(--green-dim); margin-bottom: 0.5rem; }
@@ -230,9 +234,9 @@
     .exp-role { color: var(--green); font-size: 0.8rem; margin-top: 0.25rem; margin-bottom: 1rem; }
     .exp-desc { font-size: 0.8rem; color: var(--text-dim); list-style: none; }
     .exp-desc li { padding: 0.25rem 0 0.25rem 1.2rem; position: relative; }
-    .exp-desc li::before { content: '–'; position: absolute; left: 0; color: var(--green); }
+    .exp-desc li::before { content: '-'; position: absolute; left: 0; color: var(--green); }
 
-    /* STATS */
+    /* ── STATS ── */
     .stats-row { display: flex; gap: 3rem; flex-wrap: wrap; margin-bottom: 4rem; }
     .stat-num {
       font-family: var(--font-display); font-size: 2.5rem; font-weight: 800;
@@ -243,17 +247,15 @@
       letter-spacing: 0.12em; text-transform: uppercase; margin-top: 0.25rem;
     }
 
-    /* PROJECTS */
+    /* ── PROJECTS ── */
     .projects-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(380px, 1fr));
-      gap: 1.5rem;
+      display: grid; grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); gap: 1.5rem;
     }
     .project-card {
       background: var(--bg-card); border: 1px solid var(--border);
       padding: 2rem; position: relative; overflow: hidden;
-      transition: border-color 0.3s;
-      text-decoration: none; display: block; color: inherit; cursor: none;
+      transition: border-color 0.3s; text-decoration: none;
+      display: block; color: inherit;
     }
     .project-card:hover { border-color: var(--green); }
     .project-card::before {
@@ -262,7 +264,7 @@
       transition: transform 0.4s ease;
     }
     .project-card:hover::before { transform: scaleX(1); }
-    .project-card .gh-hint {
+    .gh-hint {
       position: absolute; top: 1.25rem; right: 1.25rem;
       font-size: 0.65rem; color: var(--text-dim);
       letter-spacing: 0.1em; opacity: 0; transition: opacity 0.2s;
@@ -281,7 +283,7 @@
     }
     .tag-green { border-color: var(--green); color: var(--green); }
 
-    /* SKILLS */
+    /* ── SKILLS ── */
     .skills-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1.5rem; }
     .skill-group { padding: 1.5rem; border: 1px solid var(--border); }
     .skill-group-title {
@@ -299,7 +301,7 @@
     .skill-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--border); }
     .skill-dot.on { background: var(--green); }
 
-    /* EDUCATION */
+    /* ── EDUCATION ── */
     .edu-block {
       display: grid; grid-template-columns: 200px 1fr; gap: 2rem;
       padding: 2.5rem; border: 1px solid var(--border);
@@ -312,41 +314,33 @@
     .edu-degree { color: var(--green); font-size: 0.8rem; margin-bottom: 1.5rem; }
     .coursework { display: flex; flex-wrap: wrap; gap: 0.4rem; }
 
-    /* REVIEWS */
+    /* ── REVIEWS ── */
     .reviews-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.5rem; }
     .review-card { background: var(--bg-card); border: 1px solid var(--border); padding: 2rem; }
     .review-quote {
       font-size: 0.85rem; line-height: 1.8; color: var(--text);
       margin-bottom: 1.5rem; font-style: italic;
     }
-    .review-quote::before {
-      content: '\201C'; color: var(--green); font-size: 1.5rem;
-      line-height: 0; vertical-align: -0.4em; margin-right: 0.25rem;
-    }
+    .review-quote::before { content: '\201C'; color: var(--green); font-size: 1.5rem; line-height: 0; vertical-align: -0.4em; margin-right: 0.25rem; }
     .review-author { font-size: 0.75rem; color: var(--text-dim); }
     .review-name { color: var(--green-dim); font-weight: 600; }
 
-    /* CONTACT */
+    /* ── CONTACT ── */
     #contact { text-align: center; }
-    #contact .section-label, #contact .section-title { text-align: center; }
     .contact-links {
-      display: flex; justify-content: center; gap: 1rem;
-      flex-wrap: wrap; margin-top: 2rem;
+      display: flex; justify-content: center; gap: 1rem; flex-wrap: wrap; margin-top: 2rem;
     }
     .contact-link {
       display: inline-flex; align-items: center; gap: 0.5rem;
       padding: 0.8rem 1.6rem; border: 1px solid var(--border);
       color: var(--text-dim); text-decoration: none;
-      font-size: 0.8rem; transition: all 0.2s; cursor: none;
+      font-size: 0.8rem; transition: all 0.2s;
     }
     .contact-link:hover { border-color: var(--green); color: var(--green); }
-    .contact-link svg { width: 16px; height: 16px; }
-    .contact-tagline {
-      max-width: 420px; margin: 0 auto 1rem;
-      color: var(--text-dim); font-size: 0.85rem; line-height: 1.8;
-    }
+    .contact-link svg { width: 16px; height: 16px; flex-shrink: 0; }
+    .contact-tagline { max-width: 420px; margin: 0 auto 1rem; color: var(--text-dim); font-size: 0.85rem; line-height: 1.8; }
 
-    /* FOOTER */
+    /* ── FOOTER ── */
     footer {
       border-top: 1px solid var(--border); padding: 2rem 3rem;
       display: flex; justify-content: space-between; align-items: center;
@@ -355,30 +349,38 @@
     }
     .footer-dot { color: var(--green); }
 
-    /* SCROLL REVEAL */
-    .reveal {
-      opacity: 0; transform: translateY(24px);
-      transition: opacity 0.55s ease, transform 0.55s ease;
-    }
+    /* ── SCROLL REVEAL ── */
+    .reveal { opacity: 0; transform: translateY(24px); transition: opacity 0.55s ease, transform 0.55s ease; }
     .reveal.visible { opacity: 1; transform: none; }
 
-    /* KEYFRAMES */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: none; }
-    }
+    /* ── KEYFRAMES ── */
+    @keyframes fadeUp  { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: none; } }
     @keyframes fadeIn  { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes fadeLeft {
-      from { opacity: 0; transform: translate(20px,-50%); }
-      to   { opacity: 1; transform: translate(0,-50%); }
-    }
+    @keyframes fadeLeft { from { opacity: 0; transform: translate(20px,-50%); } to { opacity: 1; transform: translate(0,-50%); } }
+
+    /* ── MOBILE ── */
+    @media (max-width: 900px) { .terminal { display: none; } }
 
     @media (max-width: 640px) {
       nav { padding: 1rem 1.5rem; }
-      .nav-links { gap: 1.5rem; }
-      section, #hero, footer { padding-left: 1.5rem; padding-right: 1.5rem; }
-      .exp-item, .edu-block { grid-template-columns: 1fr; gap: 0.5rem; }
+      .nav-links { gap: 1.2rem; }
+      .nav-links a { font-size: 0.7rem; }
+      section, #hero, footer { padding-left: 1.25rem; padding-right: 1.25rem; }
+      section { padding-top: 4rem; padding-bottom: 4rem; }
+      .hero-sub { font-size: 0.82rem; }
+      .exp-item { grid-template-columns: 1fr; gap: 0.5rem; }
+      .edu-block { grid-template-columns: 1fr; gap: 0.5rem; padding: 1.5rem; }
       .projects-grid { grid-template-columns: 1fr; }
+      .skills-grid { grid-template-columns: 1fr; }
+      .reviews-grid { grid-template-columns: 1fr; }
+      .stats-row { gap: 1.5rem; }
+      .contact-links { flex-direction: column; align-items: stretch; }
+      .contact-link { justify-content: center; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+      .reveal { opacity: 1; transform: none; }
     }
   </style>
 </head>
@@ -412,9 +414,7 @@
 
     <div class="terminal">
       <div class="terminal-bar">
-        <div class="dot dot-r"></div>
-        <div class="dot dot-y"></div>
-        <div class="dot dot-g"></div>
+        <div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div>
       </div>
       <div class="term-line"><span class="term-prompt">$</span><span>whoami</span></div>
       <div class="term-line"><span class="term-out">theodor-rolea</span></div>
@@ -425,10 +425,7 @@
       <div class="term-line"><span class="term-prompt">$</span><span id="typed-cmd"></span><span class="term-cursor"></span></div>
     </div>
 
-    <div class="hero-scroll">
-      <div class="scroll-line"></div>
-      scroll to explore
-    </div>
+    <div class="hero-scroll"><div class="scroll-line"></div>scroll to explore</div>
   </div>
 
   <div class="divider"></div>
@@ -437,14 +434,12 @@
   <section id="experience">
     <div class="section-label">// 01 &mdash; experience</div>
     <h2 class="section-title">Where I've<br>shipped.</h2>
-
     <div class="stats-row">
       <div class="stat reveal"><div class="stat-num">3+</div><div class="stat-label">Years Trading</div></div>
       <div class="stat reveal"><div class="stat-num">55%+</div><div class="stat-label">Model Accuracy</div></div>
       <div class="stat reveal"><div class="stat-num">1.8</div><div class="stat-label">Risk:Reward Ratio</div></div>
       <div class="stat reveal"><div class="stat-num">60%</div><div class="stat-label">App Performance Gain</div></div>
     </div>
-
     <div class="exp-item reveal">
       <div class="exp-meta">
         <div class="exp-date">Jun 2022 &ndash; Jun 2025</div>
@@ -616,7 +611,6 @@
         <div class="review-author"><span class="review-name">&mdash; Peer, ML Project Group</span></div>
       </div>
     </div>
-
   </section>
 
   <div class="divider"></div>
@@ -647,34 +641,37 @@
   </section>
 
   <footer>
-    <div>THEODOR-IOAN ROLEA <span class="footer-dot">&#9679;</span> 2025</div>
+    <div>THEODOR-Ioan ROLEA <span class="footer-dot">&#9679;</span> 2025</div>
     <div>built with intention</div>
   </footer>
 
   <script>
-    // ── Custom cursor ──
-    const cursor = document.getElementById('cursor');
-    const ring   = document.getElementById('cursor-ring');
-    let mx = 0, my = 0, rx = 0, ry = 0;
+    // ── Custom cursor: only on devices with a real mouse ──
+    if (window.matchMedia('(hover: hover) and (pointer: fine)').matches) {
+      document.body.classList.add('has-mouse');
+      const cursor = document.getElementById('cursor');
+      const ring   = document.getElementById('cursor-ring');
+      let mx = 0, my = 0, rx = 0, ry = 0;
 
-    document.addEventListener('mousemove', e => {
-      mx = e.clientX; my = e.clientY;
-      cursor.style.left = mx + 'px';
-      cursor.style.top  = my + 'px';
-    });
+      document.addEventListener('mousemove', e => {
+        mx = e.clientX; my = e.clientY;
+        cursor.style.left = mx + 'px';
+        cursor.style.top  = my + 'px';
+      });
 
-    (function animateRing() {
-      rx += (mx - rx) * 0.13;
-      ry += (my - ry) * 0.13;
-      ring.style.left = rx + 'px';
-      ring.style.top  = ry + 'px';
-      requestAnimationFrame(animateRing);
-    })();
+      (function animateRing() {
+        rx += (mx - rx) * 0.13;
+        ry += (my - ry) * 0.13;
+        ring.style.left = rx + 'px';
+        ring.style.top  = ry + 'px';
+        requestAnimationFrame(animateRing);
+      })();
 
-    document.querySelectorAll('a, button').forEach(el => {
-      el.addEventListener('mouseenter', () => ring.classList.add('hovered'));
-      el.addEventListener('mouseleave', () => ring.classList.remove('hovered'));
-    });
+      document.querySelectorAll('a, button').forEach(el => {
+        el.addEventListener('mouseenter', () => ring.classList.add('hovered'));
+        el.addEventListener('mouseleave', () => ring.classList.remove('hovered'));
+      });
+    }
 
     // ── Terminal typing ──
     const cmds = ['cat projects.txt', 'ls -la ./experience', 'python train.py', 'git push origin main'];
