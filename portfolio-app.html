@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Portfolio Management App &mdash; Theodor Rolea</title>
+  <meta name="description" content="End-to-end ML Android application for portfolio management with predictive analytics and AI-driven insights." />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --accent: #6EE7B7;
+      --accent-bright: #34D399;
+      --accent-dim: #059669;
+      --accent-glow: rgba(110, 231, 183, 0.15);
+      --accent-glow-strong: rgba(110, 231, 183, 0.25);
+      --blue: #3B82F6;
+      --blue-dim: #2563EB;
+      --purple: #8B5CF6;
+      --amber: #F59E0B;
+      --bg: #0B0F14;
+      --bg-card: rgba(255, 255, 255, 0.03);
+      --bg-card-hover: rgba(255, 255, 255, 0.06);
+      --text: #E2E8F0;
+      --text-dim: #64748B;
+      --text-muted: #475569;
+      --border: rgba(255, 255, 255, 0.08);
+      --border-hover: rgba(255, 255, 255, 0.15);
+      --radius: 12px;
+      --radius-lg: 16px;
+      --radius-xl: 20px;
+      --font-body: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-display: 'Space Grotesk', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+      --ease: cubic-bezier(0.16, 1, 0.3, 1);
+      --max-w: 1080px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--font-body);
+      font-size: 15px;
+      line-height: 1.7;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    /* ── NOISE ── */
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.02'/%3E%3C/svg%3E");
+      opacity: 0.4; pointer-events: none; z-index: 99;
+    }
+
+    /* ── BACKGROUND MESH ── */
+    .bg-mesh {
+      position: fixed; inset: 0; z-index: -1; overflow: hidden;
+    }
+    .bg-mesh::before {
+      content: '';
+      position: absolute;
+      top: -30%; left: -15%;
+      width: 70%; height: 70%;
+      background: radial-gradient(ellipse, rgba(110, 231, 183, 0.05) 0%, transparent 70%);
+      animation: meshFloat1 20s ease-in-out infinite;
+    }
+    .bg-mesh::after {
+      content: '';
+      position: absolute;
+      bottom: -25%; right: -15%;
+      width: 60%; height: 60%;
+      background: radial-gradient(ellipse, rgba(59, 130, 246, 0.04) 0%, transparent 70%);
+      animation: meshFloat2 25s ease-in-out infinite;
+    }
+    @keyframes meshFloat1 {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(5%, 8%); }
+    }
+    @keyframes meshFloat2 {
+      0%, 100% { transform: translate(0, 0); }
+      50% { transform: translate(-5%, -6%); }
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 500;
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1rem 3rem;
+      border-bottom: 1px solid var(--border);
+      backdrop-filter: blur(20px) saturate(1.2);
+      -webkit-backdrop-filter: blur(20px) saturate(1.2);
+      background: rgba(11, 15, 20, 0.8);
+    }
+    .nav-back {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      color: var(--text-dim); text-decoration: none;
+      font-size: 0.85rem; font-weight: 500;
+      transition: color 0.25s;
+    }
+    .nav-back:hover { color: var(--accent); }
+    .nav-back svg { width: 16px; height: 16px; }
+    .nav-logo {
+      font-family: var(--font-display); font-weight: 700; font-size: 1.1rem;
+      color: var(--accent); text-decoration: none; letter-spacing: -0.02em;
+    }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 8rem 3rem 5rem;
+      max-width: var(--max-w); margin: 0 auto;
+    }
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      padding: 0.4rem 1rem; border-radius: 100px;
+      background: rgba(110, 231, 183, 0.08);
+      border: 1px solid rgba(110, 231, 183, 0.15);
+      color: var(--accent); font-family: var(--font-mono);
+      font-size: 0.75rem; font-weight: 500; letter-spacing: 0.04em;
+      margin-bottom: 1.5rem;
+    }
+    .hero-badge .dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent-glow-strong);
+    }
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.2rem, 5.5vw, 3.8rem); font-weight: 700;
+      line-height: 1.1; letter-spacing: -0.035em; color: #fff;
+      margin-bottom: 1.25rem;
+    }
+    .hero-title em {
+      font-style: normal;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--blue) 100%);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .hero-desc {
+      max-width: 600px; color: var(--text-dim); font-size: 1.05rem;
+      line-height: 1.75; margin-bottom: 2rem;
+    }
+    .hero-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 2.5rem; }
+    .tag {
+      font-size: 0.72rem; font-weight: 500; padding: 0.3rem 0.75rem;
+      border: 1px solid var(--border); color: var(--text-dim);
+      letter-spacing: 0.04em; border-radius: 6px;
+    }
+    .tag-accent { border-color: rgba(110, 231, 183, 0.3); color: var(--accent); background: rgba(110, 231, 183, 0.05); }
+    .tag-blue { border-color: rgba(59, 130, 246, 0.3); color: var(--blue); background: rgba(59, 130, 246, 0.05); }
+
+    .hero-stats {
+      display: flex; gap: 3rem; flex-wrap: wrap;
+      padding-top: 2rem; border-top: 1px solid var(--border);
+    }
+    .hero-stat-num {
+      font-family: var(--font-display); font-size: 2rem; font-weight: 700;
+      background: linear-gradient(135deg, var(--accent) 0%, var(--blue) 100%);
+      -webkit-background-clip: text; background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1;
+    }
+    .hero-stat-label {
+      font-size: 0.75rem; color: var(--text-muted);
+      letter-spacing: 0.08em; text-transform: uppercase;
+      margin-top: 0.3rem; font-weight: 500;
+    }
+
+    /* ── SECTIONS ── */
+    section {
+      padding: 5rem 3rem;
+      max-width: var(--max-w); margin: 0 auto;
+    }
+    .section-label {
+      font-family: var(--font-mono);
+      font-size: 0.75rem; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase;
+      color: var(--accent); margin-bottom: 0.75rem;
+      display: inline-flex; align-items: center; gap: 0.75rem;
+    }
+    .section-label::after {
+      content: ''; display: inline-block;
+      width: 40px; height: 1px; background: var(--accent); opacity: 0.3;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.8rem, 4vw, 2.6rem); font-weight: 700;
+      letter-spacing: -0.03em; color: #fff; margin-bottom: 1rem; line-height: 1.15;
+    }
+    .section-desc {
+      color: var(--text-dim); font-size: 0.95rem; line-height: 1.75;
+      max-width: 600px; margin-bottom: 3rem;
+    }
+
+    .divider {
+      width: 100%; max-width: calc(var(--max-w) - 6rem); margin: 0 auto;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border) 20%, var(--border) 80%, transparent);
+    }
+
+    /* ── SCREENSHOTS ── */
+    .screenshots-wrapper {
+      position: relative;
+      overflow: hidden;
+      margin: 0 -3rem;
+      padding: 0 3rem;
+    }
+    .screenshots-scroll {
+      display: flex; gap: 1.5rem;
+      overflow-x: auto; overflow-y: hidden;
+      padding: 1rem 0 2rem;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      cursor: grab;
+      user-select: none;
+    }
+    .screenshots-scroll.dragging {
+      cursor: grabbing;
+      scroll-snap-type: none;
+      scroll-behavior: auto;
+    }
+    .screenshots-scroll::-webkit-scrollbar { display: none; }
+
+    /* Fade edges */
+    .screenshots-wrapper::before,
+    .screenshots-wrapper::after {
+      content: ''; position: absolute; top: 0; bottom: 0; width: 60px;
+      z-index: 2; pointer-events: none;
+    }
+    .screenshots-wrapper::before {
+      left: 0;
+      background: linear-gradient(to right, var(--bg), transparent);
+    }
+    .screenshots-wrapper::after {
+      right: 0;
+      background: linear-gradient(to left, var(--bg), transparent);
+    }
+
+    /* Arrow buttons */
+    .screenshots-arrow {
+      position: absolute; top: 50%; transform: translateY(-50%);
+      z-index: 3;
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      border: 1px solid var(--border);
+      background: rgba(11, 15, 20, 0.85);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      color: var(--text-dim);
+      display: flex; align-items: center; justify-content: center;
+      cursor: pointer;
+      transition: all 0.25s var(--ease);
+      opacity: 0.8;
+    }
+    .screenshots-arrow:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      opacity: 1;
+      box-shadow: 0 0 20px rgba(110, 231, 183, 0.15);
+    }
+    .screenshots-arrow:active { transform: translateY(-50%) scale(0.93); }
+    .screenshots-arrow svg { width: 18px; height: 18px; }
+    .screenshots-arrow-left { left: 1rem; }
+    .screenshots-arrow-right { right: 1rem; }
+    .screenshots-arrow.hidden { opacity: 0; pointer-events: none; }
+
+    @media (max-width: 768px) {
+      .screenshots-arrow { width: 36px; height: 36px; }
+      .screenshots-arrow svg { width: 15px; height: 15px; }
+      .screenshots-arrow-left { left: 0.25rem; }
+      .screenshots-arrow-right { right: 0.25rem; }
+    }
+
+    /* Scroll indicator dots */
+    .screenshots-nav {
+      display: flex; align-items: center; justify-content: center; gap: 1rem;
+      padding: 1rem 0 0.5rem;
+    }
+    .screenshots-counter {
+      font-family: var(--font-mono);
+      font-size: 0.75rem; font-weight: 500;
+      color: var(--text-muted);
+    }
+    .screenshots-counter span { color: var(--accent); }
+    .screenshots-dots {
+      display: flex; justify-content: center; gap: 6px;
+    }
+    .screenshots-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--border);
+      transition: all 0.3s var(--ease);
+      border: none; padding: 0; cursor: pointer;
+    }
+    .screenshots-dot.active {
+      background: var(--accent);
+      width: 20px; border-radius: 3px;
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
+
+    .screenshot-item {
+      flex: 0 0 auto;
+      scroll-snap-align: center;
+      position: relative;
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      border: 1px solid var(--border);
+      background: var(--bg-card);
+      transition: border-color 0.3s, transform 0.3s var(--ease);
+    }
+    .screenshot-item:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-4px);
+    }
+    .screenshots-scroll.dragging .screenshot-item {
+      transform: none;
+      pointer-events: none;
+    }
+    .screenshot-item img {
+      display: block;
+      height: 520px;
+      width: auto;
+      object-fit: contain;
+      pointer-events: none;
+    }
+    .screenshot-label {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 1.5rem 1.25rem 1rem;
+      background: linear-gradient(transparent, rgba(11, 15, 20, 0.95));
+      font-size: 0.8rem; font-weight: 500; color: var(--text);
+    }
+    .screenshot-label span {
+      display: block; font-size: 0.7rem; color: var(--text-dim); margin-top: 0.15rem;
+    }
+
+    /* ── FEATURES GRID ── */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.25rem;
+    }
+    .feature-card {
+      padding: 2rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      background: var(--bg-card);
+      backdrop-filter: blur(8px);
+      transition: border-color 0.3s, transform 0.3s var(--ease);
+    }
+    .feature-card:hover {
+      border-color: var(--border-hover);
+      transform: translateY(-2px);
+    }
+    .feature-icon {
+      width: 40px; height: 40px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 10px; margin-bottom: 1.25rem;
+      font-size: 1.1rem;
+    }
+    .feature-icon svg { width: 22px; height: 22px; }
+    .feature-icon-green { background: rgba(110, 231, 183, 0.1); color: var(--accent); }
+    .feature-icon-blue { background: rgba(59, 130, 246, 0.1); color: var(--blue); }
+    .feature-icon-purple { background: rgba(139, 92, 246, 0.1); color: var(--purple); }
+    .feature-icon-amber { background: rgba(245, 158, 11, 0.1); color: var(--amber); }
+    .feature-title {
+      font-family: var(--font-display); font-size: 1.05rem; font-weight: 600;
+      color: #fff; margin-bottom: 0.5rem; letter-spacing: -0.01em;
+    }
+    .feature-desc {
+      font-size: 0.85rem; color: var(--text-dim); line-height: 1.7;
+    }
+
+    /* ── ARCHITECTURE ── */
+    .arch-container {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      background: var(--bg-card);
+      backdrop-filter: blur(8px);
+    }
+    .arch-header {
+      padding: 1.5rem 2rem;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 0.75rem;
+    }
+    .arch-dot { width: 10px; height: 10px; border-radius: 50%; }
+    .arch-dot-r { background: #FF5F57; }
+    .arch-dot-y { background: #FEBC2E; }
+    .arch-dot-g { background: #28C840; }
+    .arch-title {
+      font-family: var(--font-mono); font-size: 0.8rem; font-weight: 500;
+      color: var(--text-dim); margin-left: 0.5rem;
+    }
+    .arch-body { padding: 2.5rem 2rem; }
+
+    .arch-layers { display: flex; flex-direction: column; gap: 2rem; }
+
+    .arch-layer {
+      border: 1px solid var(--border); border-radius: var(--radius);
+      padding: 1.75rem; position: relative;
+    }
+    .arch-layer-label {
+      position: absolute; top: -0.6rem; left: 1.25rem;
+      background: var(--bg); padding: 0 0.5rem;
+      font-family: var(--font-mono); font-size: 0.7rem; font-weight: 500;
+      letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    .arch-layer-label-green { color: var(--accent); }
+    .arch-layer-label-blue { color: var(--blue); }
+    .arch-layer-label-purple { color: var(--purple); }
+    .arch-layer-label-amber { color: var(--amber); }
+
+    .arch-nodes {
+      display: flex; flex-wrap: wrap; gap: 0.75rem;
+    }
+    .arch-node {
+      padding: 0.6rem 1rem;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.8rem; font-weight: 500;
+      color: var(--text); background: rgba(255,255,255,0.02);
+      transition: border-color 0.2s;
+    }
+    .arch-node:hover { border-color: var(--border-hover); }
+
+    .arch-connector {
+      display: flex; justify-content: center; padding: 0.25rem 0;
+      color: var(--text-muted);
+    }
+    .arch-connector svg { width: 20px; height: 20px; }
+
+    /* ── TECH STACK ── */
+    .stack-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 1rem;
+    }
+    .stack-item {
+      display: flex; align-items: center; gap: 1rem;
+      padding: 1.25rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg-card);
+      transition: border-color 0.3s;
+    }
+    .stack-item:hover { border-color: var(--border-hover); }
+    .stack-icon {
+      width: 36px; height: 36px;
+      display: flex; align-items: center; justify-content: center;
+      border-radius: 8px; flex-shrink: 0;
+      font-family: var(--font-mono); font-size: 0.75rem; font-weight: 600;
+    }
+    .stack-name { font-size: 0.9rem; font-weight: 500; color: var(--text); }
+    .stack-role { font-size: 0.75rem; color: var(--text-dim); }
+
+    /* ── AI SCORES DEMO ── */
+    .scores-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 1rem;
+    }
+    .score-card {
+      padding: 1.5rem;
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      background: var(--bg-card);
+    }
+    .score-label {
+      font-size: 0.8rem; font-weight: 500; color: var(--text-dim);
+      margin-bottom: 0.75rem;
+    }
+    .score-value {
+      font-family: var(--font-display); font-size: 1.8rem; font-weight: 700;
+      color: #fff; line-height: 1; margin-bottom: 0.75rem;
+    }
+    .score-bar-track {
+      width: 100%; height: 4px; background: rgba(255,255,255,0.06);
+      border-radius: 2px; overflow: hidden;
+    }
+    .score-bar-fill {
+      height: 100%; border-radius: 2px;
+      transition: width 1s var(--ease);
+    }
+    .score-bar-green { background: linear-gradient(90deg, var(--accent-dim), var(--accent)); }
+    .score-bar-amber { background: linear-gradient(90deg, #D97706, var(--amber)); }
+    .score-bar-blue { background: linear-gradient(90deg, var(--blue-dim), var(--blue)); }
+
+    /* ── CTA SECTION ── */
+    .cta-section {
+      text-align: center; padding: 5rem 3rem;
+      max-width: var(--max-w); margin: 0 auto;
+    }
+    .cta-title {
+      font-family: var(--font-display);
+      font-size: clamp(1.6rem, 3.5vw, 2.4rem); font-weight: 700;
+      color: #fff; margin-bottom: 1rem; letter-spacing: -0.02em;
+    }
+    .cta-desc {
+      color: var(--text-dim); font-size: 0.95rem; max-width: 480px;
+      margin: 0 auto 2rem; line-height: 1.75;
+    }
+    .cta-buttons { display: flex; justify-content: center; gap: 0.75rem; flex-wrap: wrap; }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 0.5rem;
+      padding: 0.75rem 1.5rem; font-family: var(--font-body);
+      font-size: 0.85rem; font-weight: 500; text-decoration: none;
+      border-radius: var(--radius); letter-spacing: 0.01em;
+      transition: all 0.25s var(--ease);
+    }
+    .btn-primary {
+      background: var(--accent); color: #0B0F14;
+      box-shadow: 0 0 20px rgba(110, 231, 183, 0.2), 0 4px 12px rgba(0,0,0,0.3);
+    }
+    .btn-primary:hover {
+      background: #fff; color: #0B0F14;
+      box-shadow: 0 0 30px rgba(255,255,255,0.15), 0 4px 16px rgba(0,0,0,0.4);
+      transform: translateY(-1px);
+    }
+    .btn-outline {
+      border: 1px solid var(--border); color: var(--text-dim);
+      background: var(--bg-card);
+    }
+    .btn-outline:hover {
+      border-color: var(--accent); color: var(--accent);
+      background: rgba(110, 231, 183, 0.05);
+      transform: translateY(-1px);
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 1px solid var(--border); padding: 2.5rem 3rem;
+      display: flex; justify-content: space-between; align-items: center;
+      color: var(--text-muted); font-size: 0.75rem; font-weight: 500;
+      letter-spacing: 0.08em; max-width: var(--max-w); margin: 0 auto;
+    }
+    .footer-dot { color: var(--accent); }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal {
+      opacity: 0; transform: translateY(20px);
+      transition: opacity 0.6s var(--ease), transform 0.6s var(--ease);
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* ── FOCUS ── */
+    a:focus-visible, button:focus-visible {
+      outline: 2px solid var(--accent);
+      outline-offset: 3px;
+      border-radius: 4px;
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      nav { padding: 1rem 1.25rem; }
+      .hero { padding: 6rem 1.25rem 3rem; }
+      section { padding: 3.5rem 1.25rem; }
+      .hero-stats { gap: 1.5rem; }
+      .features-grid { grid-template-columns: 1fr; }
+      .scores-grid { grid-template-columns: repeat(2, 1fr); }
+      .stack-grid { grid-template-columns: 1fr; }
+      .screenshots-wrapper { margin: 0 -1.25rem; padding: 0 1.25rem; }
+      .screenshot-item img { height: 420px; }
+      .arch-body { padding: 1.5rem 1rem; }
+      .arch-nodes { gap: 0.5rem; }
+      .cta-section { padding: 3.5rem 1.25rem; }
+      footer { flex-direction: column; gap: 0.5rem; text-align: center; padding: 2rem 1.25rem; }
+    }
+
+    @media (max-width: 480px) {
+      .scores-grid { grid-template-columns: 1fr; }
+      .screenshot-item img { height: 360px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+      .reveal { opacity: 1; transform: none; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-mesh"></div>
+
+  <nav>
+    <a href="updated_website.html" class="nav-back">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+      Back
+    </a>
+    <a href="updated_website.html" class="nav-logo">T.R</a>
+  </nav>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="hero-badge reveal"><span class="dot"></span> Private Repository &middot; 2025</div>
+    <h1 class="hero-title reveal">Portfolio<br>Management <em>App</em></h1>
+    <p class="hero-desc reveal">
+      An end-to-end ML-powered Android application that integrates custom predictive algorithms,
+      real-time analytics dashboards, and AI-driven portfolio optimization &mdash; from data
+      ingestion to actionable insights.
+    </p>
+    <div class="hero-tags reveal">
+      <span class="tag tag-accent">Kotlin</span>
+      <span class="tag tag-accent">Python</span>
+      <span class="tag tag-blue">Machine Learning</span>
+      <span class="tag tag-blue">Time-Series</span>
+      <span class="tag">Android</span>
+      <span class="tag">Firebase</span>
+      <span class="tag">REST APIs</span>
+      <span class="tag">Room DB</span>
+    </div>
+    <div class="hero-stats reveal">
+      <div>
+        <div class="hero-stat-num">65%+</div>
+        <div class="hero-stat-label">Forecast Accuracy</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">6</div>
+        <div class="hero-stat-label">Backend APIs</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">5</div>
+        <div class="hero-stat-label">AI Score Dimensions</div>
+      </div>
+      <div>
+        <div class="hero-stat-num">Real-time</div>
+        <div class="hero-stat-label">Analytics</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- SCREENSHOTS -->
+  <section>
+    <div class="section-label reveal">App Screens</div>
+    <h2 class="section-title reveal">See it in action.</h2>
+    <p class="section-desc reveal">From stock analysis with candlestick charts to AI-powered portfolio optimization, every screen is built for clarity and speed.</p>
+
+    <div class="screenshots-wrapper reveal">
+    <button class="screenshots-arrow screenshots-arrow-left hidden" id="arrow-left" aria-label="Previous screenshot">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
+    </button>
+    <button class="screenshots-arrow screenshots-arrow-right" id="arrow-right" aria-label="Next screenshot">
+      <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+    </button>
+    <div class="screenshots-scroll" id="screenshots">
+      <div class="screenshot-item">
+        <img src="screenshots/homepage1.png" alt="Home screen showing portfolio value, watchlist, and top gainers" />
+        <div class="screenshot-label">Home Dashboard<span>Portfolio value, watchlist &amp; gainers</span></div>
+      </div>
+      <div class="screenshot-item">
+        <img src="screenshots/homepage2.png" alt="Smart watchlist with AI-generated diversification picks and growth opportunities" />
+        <div class="screenshot-label">Smart Suggestions<span>AI-driven picks &amp; growth opportunities</span></div>
+      </div>
+      <div class="screenshot-item">
+        <img src="screenshots/search2.png" alt="Stock search results for Apple" />
+        <div class="screenshot-label">Stock Search<span>Find any company instantly</span></div>
+      </div>
+      <div class="screenshot-item">
+        <img src="screenshots/company_1.png" alt="Apple Inc candlestick chart with AI Score Summary" />
+        <div class="screenshot-label">Stock Analysis<span>Candlestick charts &amp; AI scores</span></div>
+      </div>
+      <div class="screenshot-item">
+        <img src="screenshots/company_2.png" alt="Apple Inc line chart view with AI scores" />
+        <div class="screenshot-label">Line Chart View<span>Switchable chart types</span></div>
+      </div>
+      <div class="screenshot-item">
+        <img src="screenshots/company_3.png" alt="AI Score Summary with buy interface" />
+        <div class="screenshot-label">Buy Stocks<span>AI scores &amp; instant trading</span></div>
+      </div>
+      <div class="screenshot-item">
+        <img src="screenshots/company_4.png" alt="How AI Scores are calculated explanation modal" />
+        <div class="screenshot-label">Score Methodology<span>Transparent AI scoring breakdown</span></div>
+      </div>
+      <div class="screenshot-item">
+        <img src="screenshots/company_5.png" alt="Buy and sell interface for Apple stock" />
+        <div class="screenshot-label">Trade Execution<span>Buy &amp; sell with profit tracking</span></div>
+      </div>
+      <div class="screenshot-item">
+        <img src="screenshots/portfolio.png" alt="Portfolio performance chart with holdings" />
+        <div class="screenshot-label">Portfolio Tracker<span>Performance history &amp; holdings</span></div>
+      </div>
+      <div class="screenshot-item">
+        <img src="screenshots/analyst_1.png" alt="AI Portfolio Analyst with pie chart and risk tolerance" />
+        <div class="screenshot-label">AI Analyst<span>Composition &amp; risk tolerance</span></div>
+      </div>
+      <div class="screenshot-item">
+        <img src="screenshots/analyst_2.png" alt="AI suggestions for sector diversification" />
+        <div class="screenshot-label">AI Suggestions<span>Sector analysis &amp; rebalancing</span></div>
+      </div>
+      <div class="screenshot-item">
+        <img src="screenshots/analyst_3.png" alt="AI Portfolio Optimization with detailed analysis" />
+        <div class="screenshot-label">Portfolio Optimization<span>What's good, risky &amp; actionable</span></div>
+      </div>
+      <div class="screenshot-item">
+        <img src="screenshots/usersettings_1.png" alt="User profile with virtual funds management" />
+        <div class="screenshot-label">User Settings<span>Profile &amp; virtual funds</span></div>
+      </div>
+    </div>
+    <div class="screenshots-nav">
+      <div class="screenshots-dots" id="screenshots-dots"></div>
+      <div class="screenshots-counter" id="screenshots-counter"><span>1</span> / 13</div>
+    </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- FEATURES -->
+  <section>
+    <div class="section-label reveal">Core Features</div>
+    <h2 class="section-title reveal">What it does.</h2>
+    <p class="section-desc reveal">Every feature is designed around a single goal: turning raw market data into actionable intelligence.</p>
+
+    <div class="features-grid">
+      <div class="feature-card reveal">
+        <div class="feature-icon feature-icon-green">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/></svg>
+        </div>
+        <div class="feature-title">Predictive ML Models</div>
+        <div class="feature-desc">Custom algorithms achieving 65%+ accuracy on long-term time-series forecasting, with a modular pipeline enabling rapid iteration and retraining.</div>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon feature-icon-blue">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+        </div>
+        <div class="feature-title">AI Score Summary</div>
+        <div class="feature-desc">Five-dimensional scoring system &mdash; News Sentiment, Fundamentals, Financials, Valuation, and Technicals &mdash; providing a holistic view of each stock.</div>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon feature-icon-purple">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/></svg>
+        </div>
+        <div class="feature-title">Portfolio Analyst</div>
+        <div class="feature-desc">AI-driven analysis of portfolio composition with sector exposure breakdown, diversification suggestions, and concrete rebalancing proposals.</div>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon feature-icon-amber">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+        </div>
+        <div class="feature-title">Risk Management</div>
+        <div class="feature-desc">Configurable risk tolerance levels with dynamic allocation monitoring. Identifies overexposure, concentration risk, and suggests defensive positions.</div>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon feature-icon-green">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg>
+        </div>
+        <div class="feature-title">Real-time Charts</div>
+        <div class="feature-desc">Interactive candlestick and line charts with switchable views. Visual analytics dashboards for monitoring risk, allocation, and performance trends.</div>
+      </div>
+
+      <div class="feature-card reveal">
+        <div class="feature-icon feature-icon-blue">
+          <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg>
+        </div>
+        <div class="feature-title">News & Watchlist</div>
+        <div class="feature-desc">Curated market news feed with sentiment analysis integration. Personalized watchlist to track and monitor stocks of interest.</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- AI SCORES DEMO -->
+  <section>
+    <div class="section-label reveal">AI Intelligence</div>
+    <h2 class="section-title reveal">Multi-dimensional scoring.</h2>
+    <p class="section-desc reveal">Each stock is evaluated across five independent AI models, giving you a comprehensive view beyond any single metric.</p>
+
+    <div class="scores-grid reveal">
+      <div class="score-card">
+        <div class="score-label">News Sentiment</div>
+        <div class="score-value">75</div>
+        <div class="score-bar-track"><div class="score-bar-fill score-bar-green" style="width:75%"></div></div>
+      </div>
+      <div class="score-card">
+        <div class="score-label">Fundamentals</div>
+        <div class="score-value">72</div>
+        <div class="score-bar-track"><div class="score-bar-fill score-bar-green" style="width:72%"></div></div>
+      </div>
+      <div class="score-card">
+        <div class="score-label">Financials</div>
+        <div class="score-value">88</div>
+        <div class="score-bar-track"><div class="score-bar-fill score-bar-green" style="width:88%"></div></div>
+      </div>
+      <div class="score-card">
+        <div class="score-label">Valuation</div>
+        <div class="score-value">48</div>
+        <div class="score-bar-track"><div class="score-bar-fill score-bar-amber" style="width:48%"></div></div>
+      </div>
+      <div class="score-card">
+        <div class="score-label">Technicals</div>
+        <div class="score-value">60</div>
+        <div class="score-bar-track"><div class="score-bar-fill score-bar-blue" style="width:60%"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ARCHITECTURE -->
+  <section>
+    <div class="section-label reveal">System Design</div>
+    <h2 class="section-title reveal">How it's built.</h2>
+    <p class="section-desc reveal">A clean separation between frontend, backend services, authentication, and local persistence &mdash; designed for reliability and speed.</p>
+
+    <div class="arch-container reveal">
+      <div class="arch-header">
+        <div class="arch-dot arch-dot-r"></div>
+        <div class="arch-dot arch-dot-y"></div>
+        <div class="arch-dot arch-dot-g"></div>
+        <span class="arch-title">architecture.diagram</span>
+      </div>
+      <div class="arch-body">
+        <div class="arch-layers">
+
+          <div class="arch-layer">
+            <div class="arch-layer-label arch-layer-label-blue">Backend &mdash; Render Cloud</div>
+            <div class="arch-nodes">
+              <div class="arch-node">News API</div>
+              <div class="arch-node">Price API</div>
+              <div class="arch-node">Company Score API</div>
+              <div class="arch-node">Portfolio Analysis API</div>
+              <div class="arch-node">Gainers/Losers API</div>
+              <div class="arch-node">Recommend API</div>
+            </div>
+          </div>
+
+          <div class="arch-connector">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem;">
+            <div class="arch-layer">
+              <div class="arch-layer-label arch-layer-label-amber">Auth &mdash; Firebase</div>
+              <div class="arch-nodes">
+                <div class="arch-node">Authentication</div>
+                <div class="arch-node">User Settings</div>
+              </div>
+            </div>
+            <div class="arch-layer">
+              <div class="arch-layer-label arch-layer-label-purple">Storage &mdash; Room</div>
+              <div class="arch-nodes">
+                <div class="arch-node">Local Cache</div>
+                <div class="arch-node">Offline Data</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="arch-connector">
+            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"/></svg>
+          </div>
+
+          <div class="arch-layer">
+            <div class="arch-layer-label arch-layer-label-green">Frontend &mdash; Android (Kotlin)</div>
+            <div class="arch-nodes">
+              <div class="arch-node">Login / Register</div>
+              <div class="arch-node">Home &amp; Watchlist</div>
+              <div class="arch-node">Stock Detail</div>
+              <div class="arch-node">Portfolio View</div>
+              <div class="arch-node">AI Analyst</div>
+              <div class="arch-node">News Feed</div>
+              <div class="arch-node">Settings</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- TECH STACK -->
+  <section>
+    <div class="section-label reveal">Tech Stack</div>
+    <h2 class="section-title reveal">Built with.</h2>
+
+    <div class="stack-grid">
+      <div class="stack-item reveal">
+        <div class="stack-icon" style="background:rgba(139,92,246,0.1);color:#8B5CF6;">Kt</div>
+        <div><div class="stack-name">Kotlin</div><div class="stack-role">Android frontend</div></div>
+      </div>
+      <div class="stack-item reveal">
+        <div class="stack-icon" style="background:rgba(59,130,246,0.1);color:#3B82F6;">Py</div>
+        <div><div class="stack-name">Python</div><div class="stack-role">ML models &amp; backend APIs</div></div>
+      </div>
+      <div class="stack-item reveal">
+        <div class="stack-icon" style="background:rgba(245,158,11,0.1);color:#F59E0B;">Fb</div>
+        <div><div class="stack-name">Firebase</div><div class="stack-role">Auth &amp; user management</div></div>
+      </div>
+      <div class="stack-item reveal">
+        <div class="stack-icon" style="background:rgba(110,231,183,0.1);color:#6EE7B7;">Rm</div>
+        <div><div class="stack-name">Room DB</div><div class="stack-role">Local persistence &amp; caching</div></div>
+      </div>
+      <div class="stack-item reveal">
+        <div class="stack-icon" style="background:rgba(239,68,68,0.1);color:#EF4444;">Rd</div>
+        <div><div class="stack-name">Render</div><div class="stack-role">Cloud API hosting</div></div>
+      </div>
+      <div class="stack-item reveal">
+        <div class="stack-icon" style="background:rgba(168,85,247,0.1);color:#A855F7;">ML</div>
+        <div><div class="stack-name">Scikit / Custom</div><div class="stack-role">Predictive algorithms</div></div>
+      </div>
+      <div class="stack-item reveal">
+        <div class="stack-icon" style="background:rgba(20,184,166,0.1);color:#14B8A6;">Rq</div>
+        <div><div class="stack-name">REST APIs</div><div class="stack-role">Service communication</div></div>
+      </div>
+      <div class="stack-item reveal">
+        <div class="stack-icon" style="background:rgba(99,102,241,0.1);color:#6366F1;">Jt</div>
+        <div><div class="stack-name">Jetpack Compose</div><div class="stack-role">Modern Android UI</div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- CTA -->
+  <div class="cta-section">
+    <h2 class="cta-title reveal">Interested in the details?</h2>
+    <p class="cta-desc reveal">This project is part of a private repository. Reach out to discuss the architecture, ML pipeline, or potential collaborations.</p>
+    <div class="cta-buttons reveal">
+      <a href="mailto:theodor.rolea@gmail.com" class="btn btn-primary">Get in touch &rarr;</a>
+      <a href="updated_website.html#projects" class="btn btn-outline">View all projects</a>
+    </div>
+  </div>
+
+  <footer>
+    <div>THEODOR-IOAN ROLEA <span class="footer-dot">&#9679;</span> 2025</div>
+    <div>built with intention</div>
+  </footer>
+
+  <script>
+    // ── Screenshots carousel ──
+    (function() {
+      const track = document.getElementById('screenshots');
+      const dotsContainer = document.getElementById('screenshots-dots');
+      const counter = document.getElementById('screenshots-counter');
+      const arrowL = document.getElementById('arrow-left');
+      const arrowR = document.getElementById('arrow-right');
+      if (!track) return;
+
+      const items = track.querySelectorAll('.screenshot-item');
+      const count = items.length;
+      let currentIndex = 0;
+
+      // Build dots
+      items.forEach((_, i) => {
+        const dot = document.createElement('button');
+        dot.className = 'screenshots-dot' + (i === 0 ? ' active' : '');
+        dot.setAttribute('aria-label', 'Go to screenshot ' + (i + 1));
+        dot.addEventListener('click', () => goTo(i));
+        dotsContainer.appendChild(dot);
+      });
+      const dots = dotsContainer.querySelectorAll('.screenshots-dot');
+
+      function goTo(index) {
+        index = Math.max(0, Math.min(index, count - 1));
+        currentIndex = index;
+        items[index].scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+        updateUI();
+      }
+
+      function updateUI() {
+        dots.forEach((d, i) => d.classList.toggle('active', i === currentIndex));
+        if (counter) counter.innerHTML = '<span>' + (currentIndex + 1) + '</span> / ' + count;
+        arrowL.classList.toggle('hidden', currentIndex === 0);
+        arrowR.classList.toggle('hidden', currentIndex === count - 1);
+      }
+
+      // Find closest item to center on scroll (for swipe/drag sync)
+      function syncFromScroll() {
+        const trackRect = track.getBoundingClientRect();
+        const center = trackRect.left + trackRect.width / 2;
+        let closest = 0;
+        let minDist = Infinity;
+        items.forEach((item, i) => {
+          const rect = item.getBoundingClientRect();
+          const itemCenter = rect.left + rect.width / 2;
+          const dist = Math.abs(itemCenter - center);
+          if (dist < minDist) { minDist = dist; closest = i; }
+        });
+        if (closest !== currentIndex) {
+          currentIndex = closest;
+          updateUI();
+        }
+      }
+
+      let scrollTimer = null;
+      track.addEventListener('scroll', () => {
+        clearTimeout(scrollTimer);
+        scrollTimer = setTimeout(syncFromScroll, 80);
+      }, { passive: true });
+
+      // Arrow clicks
+      arrowL.addEventListener('click', () => goTo(currentIndex - 1));
+      arrowR.addEventListener('click', () => goTo(currentIndex + 1));
+
+      // Keyboard navigation
+      document.addEventListener('keydown', (e) => {
+        // Only respond if carousel is somewhat visible
+        const rect = track.getBoundingClientRect();
+        if (rect.bottom < 0 || rect.top > window.innerHeight) return;
+        if (e.key === 'ArrowLeft') { e.preventDefault(); goTo(currentIndex - 1); }
+        if (e.key === 'ArrowRight') { e.preventDefault(); goTo(currentIndex + 1); }
+      });
+
+      // ── Drag to scroll (mouse) ──
+      let isDragging = false;
+      let startX = 0;
+      let scrollStart = 0;
+      let dragMoved = false;
+
+      track.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        dragMoved = false;
+        startX = e.pageX;
+        scrollStart = track.scrollLeft;
+        track.classList.add('dragging');
+        track.style.scrollSnapType = 'none';
+      });
+
+      window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        const dx = e.pageX - startX;
+        if (Math.abs(dx) > 3) dragMoved = true;
+        track.scrollLeft = scrollStart - dx;
+      });
+
+      window.addEventListener('mouseup', () => {
+        if (!isDragging) return;
+        isDragging = false;
+        track.classList.remove('dragging');
+        // Re-enable snap and sync
+        track.style.scrollSnapType = '';
+        syncFromScroll();
+      });
+
+      // Prevent accidental click after drag
+      track.addEventListener('click', (e) => {
+        if (dragMoved) { e.preventDefault(); e.stopPropagation(); }
+      }, true);
+
+      updateUI();
+    })();
+
+    // Scroll reveal
+    const isMouse = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+
+    if (isMouse) {
+      const io = new IntersectionObserver(entries => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            const delay = Number(entry.target.dataset.delay || 0);
+            setTimeout(() => entry.target.classList.add('visible'), delay);
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.1 });
+
+      document.querySelectorAll('.reveal').forEach((el, i) => {
+        el.dataset.delay = (i % 5) * 80;
+        io.observe(el);
+      });
+    } else {
+      document.querySelectorAll('.reveal').forEach(el => {
+        el.classList.add('visible');
+      });
+    }
+  </script>
+</body>
+</html>
